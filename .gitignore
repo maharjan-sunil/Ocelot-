@@ -1,0 +1,27 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/E-commerce-App/v16/.suo
+/.vs/E-commerce-App/v17/.suo
+/.vs/E-commerce-App/FileContentIndex
+/OcelotGateway/obj
+/OrderApi/obj
+/ProductApi/obj
+/.vs/E-commerce-App/DesignTimeBuild
+/OcelotGateway/bin/Debug/net6.0
+/OrderApi/bin/Debug/net6.0
+/ProductApi/bin/Debug/net6.0
+/.vs/E-commerce-App/config
+/.vs
+/ProductApi/Logs
+/OrderApi/Logs
+/OcelotGateway/Logs
+/AuthenticationWebApi/bin/Debug/net6.0
+/AuthenticationWebApi/obj
+/JwtAuthenticationManager/bin/Debug/net6.0
+/JwtAuthenticationManager/obj
+/OrderApiTest/bin/Debug/net6.0
+/OrderApiTest/obj
+/ProductApiTest/bin/Debug/net6.0
+/ProductApiTest/obj
