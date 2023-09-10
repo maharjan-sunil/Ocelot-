@@ -14,6 +14,8 @@ namespace OrderApi.Migrations
                 table: "Orders",
                 newName: "CustomerName");
 
+
+
             migrationBuilder.AddColumn<string>(
                 name: "CustomerAddress",
                 table: "Orders",
