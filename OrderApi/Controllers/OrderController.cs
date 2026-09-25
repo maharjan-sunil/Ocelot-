@@ -60,5 +60,11 @@ namespace OrderAPI.Controllers
 
             return Ok(result);
         }
+
+        public int Calculate(int a, int b)
+        {
+            int sum = a +  b;
+            return sum;
+        }
     }
 }

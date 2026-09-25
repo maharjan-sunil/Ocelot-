@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Json;
+using ProductApi.Models;
 using ProductAPI.Models;
 
 namespace ProductAPI.Data
@@ -26,5 +27,6 @@ namespace ProductAPI.Data
         }
 
         public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<ProductCategory> Categories { get; set; }
     }
 }

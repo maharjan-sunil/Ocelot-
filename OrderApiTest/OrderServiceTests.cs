@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using OrderAPI.Controllers;
 using OrderAPI.Data;
 using OrderAPI.Models;
 using OrderAPI.Services;
@@ -302,6 +303,67 @@ namespace OrderApiTest
 
             //Assert
             Assert.Null(result);
+        }
+
+        [Theory]
+        [InlineData(5, 10, 15)]
+        [InlineData(0, 0, 0)]
+        [InlineData(-5, 5, 0)]
+        [InlineData(-5, -10, -15)]
+
+        public void Calculate_ShouldReturnSum_WhenTwoNumbersArePassed(int a, int b, int expectedSum)
+        {
+            //Arrange
+               
+            OrderController orderController = new OrderController(null);
+
+            //Act
+            int actualSum = orderController.Calculate(a, b);
+
+            //Assert
+
+            Assert.Equal(expectedSum, actualSum);
+        }
+
+        public void DeleteOrder_ShouldReturnTrue_WhenOrderdeletedSuccessfully(int id)
+        {
+            //Arrange
+
+            var result = false;
+            var options = new DbContextOptionsBuilder<DbContextClass>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            using(var context = new DbContextClass(options, true))
+            {
+                context.Orders.Add(new Order
+                {
+                    OrderId = id,
+                    OrderName = "OrderName7",
+                    ProductId = 1,
+                    CustomerName = "CutomerName",
+                    CustomerAddress = "CustomerAddress",
+                    Quantity = 1,
+                    OrderDate = DateTime.Now,
+                });
+                context.SaveChanges();
+            }
+
+           
+
+
+            var mockOrderService = new Mock<IOrderService>();
+
+
+            //Act
+            mockOrderService.Setup(service => service.DeleteOrder(id)).Returns(true);
+
+
+            //Assert
+
+            Assert.True(result);
+
+            mockOrderService.Verify(x => x.DeleteOrder(id), Times.Once);
         }
     }
 }

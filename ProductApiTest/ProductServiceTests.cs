@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using ProductApi.Models;
 using ProductAPI.Data;
 using ProductAPI.Models;
 using ProductAPI.Services;
@@ -10,7 +11,7 @@ namespace ProductApiTest
     public class ProductServiceTests
     {
         private readonly DbContextOptions<DbContextClass> options = new DbContextOptionsBuilder<DbContextClass>()
-             .UseInMemoryDatabase(databaseName: "ecommerce-app")
+             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) //using a unique database name for each test
              .Options;
         private readonly Mock<ILogger<ProductService>> _loggerMock = new Mock<ILogger<ProductService>>();
 
@@ -53,7 +54,7 @@ namespace ProductApiTest
             }
 
             //Assert
-            Assert.Equal(products.Count(), 2);
+            Assert.Equal(2,products.Count());
         }
 
         [Fact]
@@ -250,7 +251,8 @@ namespace ProductApiTest
                     ProductName = "ProductName7",
                     ProductDescription = "ProductDescription",
                     ProductPrice = 10,
-                    ProductStock = 10
+                    ProductStock = 10,
+                    ProductCategoryId = 1
                 });
                 context.SaveChanges();
             }
@@ -283,5 +285,56 @@ namespace ProductApiTest
             //Assert
             Assert.Null(result);
         }
+
+
+        [Fact]
+        public void DeleteCategory_WithLinkedProduct_BehaviorsDiverge()
+        {
+            // 1. Arrange: Create a Category and link a Product to it
+            var categoryId = 1;
+            using (var context = new DbContextClass(options, true))
+            {
+                var category = new ProductCategory { ProductCategoryId = categoryId, ProductCategoryName = "Electronics" };
+                context.Categories.Add(category);
+
+                context.Products.Add(new Product
+                {
+                    ProductId = 50,
+                    ProductName = "Phone",
+                    ProductDescription = "Smartphone",
+                    ProductCategoryId = categoryId // Relational link
+                });
+                context.SaveChanges();
+            }
+
+            bool result = false;
+
+            // 2. Act: Try to delete the Category while the Product still depends on it
+            using (var context = new DbContextClass(options, true))
+            {
+                try
+                {
+                    var categoryToDelete = context.Categories.Find(categoryId);
+                    context.Categories.Remove(categoryToDelete!);
+                    context.SaveChanges();
+
+                    result = true; // EF In-Memory reaches here successfully!
+                }
+                catch (DbUpdateException)
+                {
+                    result = false; // SQLite triggers this catch block because of the foreign key constraint
+                }
+            }
+
+            // 3. Assert: The exact same line of code
+            // -> EF Core In-Memory: 'result' is true. This line PASSES.
+            // -> SQLite In-Memory:  'result' is false. This line FAILS.
+            Assert.True(result);
+        }
+
+
+
+
+
     }
 }
